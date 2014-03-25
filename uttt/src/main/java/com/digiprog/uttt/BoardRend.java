@@ -1,6 +1,7 @@
 package com.digiprog.uttt;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -13,11 +14,10 @@ import java.nio.FloatBuffer;
 //TODO: make it render the board (now just copies the button)
 public class BoardRend {
     private static final String vertexShaderCode =
-            "uniform mat4 uMVPMatrix;" +
-                    "attribute vec2 vPosition;" +
-                    //"attribute vec2 vTexPos"+
+            "uniform mat4 mvp;" +
+                    "attribute vec2 pos;" +
                     "void main() {" +
-                    "  gl_Position = uMVPMatrix*vec4(vPosition, 0.0, 1.0);" +
+                    "  gl_Position = mvp*vec4(pos, 0.0, 1.0);" +
                     "}";
 
     private static final String fragmentShaderCode =
@@ -31,9 +31,10 @@ public class BoardRend {
 
     private static FloatBuffer vertexBuffer;
     private static FloatBuffer texBuffer;
-    private float color[] = {1.0f, 0.1f, 0.5f, 1.0f};
+    private float color[] = {0.0f, 0.1f, 0.1f, 1.0f};
 
     private static final int COORDS_IN_VERT = 2;
+
     static float coords[] = {
             //upper right triangle starting from up and right
             1.0f, 1.0f,
@@ -44,31 +45,19 @@ public class BoardRend {
             1.0f, -1.0f,
             -1.0f, 1.0f
     };
-    static float texCoords[] = {
-            //upper right triangle starting from up and right
-            1.0f, 1.0f,
-            .0f, 1.0f,
-            1.0f, .0f,
-            //down left starting from down left
-            .0f, .0f,
-            1.0f, .0f,
-            .0f, 1.0f
-    };
+
+    //static float coords[] = new float[(squareCoords.length/2)*4];
+
     private static final int vCount = coords.length/COORDS_IN_VERT;
 
     //call this before any rendering starts!
     public static void init() {
+
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 4);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(coords);
         vertexBuffer.position(0);
-
-        ByteBuffer tb = ByteBuffer.allocateDirect(texCoords.length * 4);
-        tb.order(ByteOrder.nativeOrder());
-        texBuffer = tb.asFloatBuffer();
-        texBuffer.put(texCoords);
-        texBuffer.position(0);
 
         int vShader = GameRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         int fShader = GameRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
@@ -79,14 +68,10 @@ public class BoardRend {
         GLES20.glLinkProgram(mProgram);
     }
 
-    public static void startRendering() {
-
-    }
-
     //TODO: add texturing
     public void draw(float[] mvp) {
         GLES20.glUseProgram(mProgram);
-        int posHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+        int posHandle = GLES20.glGetAttribLocation(mProgram, "pos");
         GameRenderer.checkGlError("glGetAttribLocation");
         GLES20.glEnableVertexAttribArray(posHandle);
         GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
@@ -95,12 +80,23 @@ public class BoardRend {
         GameRenderer.checkGlError("glGetUniformLocation");
         GLES20.glUniform4fv(colHandle, 1, color, 0);
 
-        int mvpHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+        int mvpHandle = GLES20.glGetUniformLocation(mProgram, "mvp");
         GameRenderer.checkGlError("glGetUniformLocation");
-        GLES20.glUniformMatrix4fv(mvpHandle, 1, false, mvp, 0);
-        GameRenderer.checkGlError("glUniformMatrix4fv");
 
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
+        float submvp[] = new float[16];
+
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                Matrix.setIdentityM(submvp, 0);
+                Matrix.translateM(submvp, 0, (((float)j)-1.0f)/1.5f, (((float)i)-1.0f)/1.5f, 0.0f);
+                Matrix.scaleM(submvp, 0, 1.0f/3.1f, 1.0f/3.1f, 0.0f);
+                Matrix.multiplyMM(submvp, 0, mvp, 0, submvp, 0);
+                GLES20.glUniformMatrix4fv(mvpHandle, 1, false, submvp, 0);
+                GameRenderer.checkGlError("glUniformMatrix4fv");
+
+                GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
+            }
+        }
         GLES20.glDisableVertexAttribArray(posHandle);
     }
 }

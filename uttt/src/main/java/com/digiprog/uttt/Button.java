@@ -11,11 +11,11 @@ import java.nio.FloatBuffer;
  */
 public class Button {
     private static final String vertexShaderCode =
-            "uniform mat4 uMVPMatrix;" +
-            "attribute vec2 vPosition;" +
+            "uniform mat4 mvp;" +
+            "attribute vec2 pos;" +
             //"attribute vec2 vTexPos"+
             "void main() {" +
-            "  gl_Position = uMVPMatrix*vec4(vPosition, 0.0, 1.0);" +
+            "  gl_Position = mvp*vec4(pos, 0.0, 1.0);" +
             "}";
 
     private static final String fragmentShaderCode =
@@ -81,7 +81,7 @@ public class Button {
     //TODO: add texturing
     public void draw(float[] mvp) {
         GLES20.glUseProgram(mProgram);
-        int posHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+        int posHandle = GLES20.glGetAttribLocation(mProgram, "pos");
         GameRenderer.checkGlError("glGetAttribLocation");
         GLES20.glEnableVertexAttribArray(posHandle);
         GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
@@ -90,7 +90,7 @@ public class Button {
         GameRenderer.checkGlError("glGetUniformLocation");
         GLES20.glUniform4fv(colHandle, 1, color, 0);
 
-        int mvpHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+        int mvpHandle = GLES20.glGetUniformLocation(mProgram, "mvp");
         GameRenderer.checkGlError("glGetUniformLocation");
         GLES20.glUniformMatrix4fv(mvpHandle, 1, false, mvp, 0);
         GameRenderer.checkGlError("glUniformMatrix4fv");
@@ -103,6 +103,10 @@ public class Button {
         color[0] = 0.0f; color[1] = 0.0f; color[2] = 1.0f;
     }
     public void buttonIdle() {
-        color[0] = 1.0f; color[1] = 0.1f; color[2] = 0.5f;
+        float cSpd = 0.06f;
+        float icSpd = 1.0f - cSpd;
+        color[0] = color[0]*icSpd+cSpd*1.0f;
+        color[1] = color[1]*icSpd+cSpd*0.1f;
+        color[2] = color[2]*icSpd+cSpd*0.5f;
     }
 }

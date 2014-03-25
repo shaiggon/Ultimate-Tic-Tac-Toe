@@ -9,7 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.SystemClock;
+//import android.os.SystemClock;
 import android.util.Log;
 
 //TODO: maek dis yo dawg
@@ -27,12 +27,13 @@ public class GameRenderer implements GLSurfaceView.Renderer{
 
 
     public Button but;
+    public BoardRend brend;
     private float but1Mat[];
     private float but1Trans[];
+    private float boardMat[];
 
     //tells where is the line between button and game board
     private float mapButtonRelation = 0.8f;
-    private float asdf = 0.0f;
 
     public GameRenderer(/*TODO: give this the game*/) {
         col = new float[4];
@@ -42,23 +43,24 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         up = false;
 
         but = new Button();
+        brend = new BoardRend();
 
         mvp = new float[16];
         but1Mat = new float[16];
         but1Trans = new float[16];
+        boardMat = new float[16];
         Matrix.setIdentityM(mvp, 0);
         Matrix.setIdentityM(but1Mat, 0);
         Matrix.setIdentityM(but1Trans, 0);
         pointerDown = false;
         pointerPressed = false;
-
-        //Matrix.setRotateM(mvp, 0, (float)(SystemClock.uptimeMillis()%360), 0, 0, 1.0f);
     }
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         GLES20.glClearColor(col[0], col[1], col[2], col[3]);
         Button.init();
+        BoardRend.init();
     }
 
     @Override
@@ -70,6 +72,7 @@ public class GameRenderer implements GLSurfaceView.Renderer{
             if(col[2] > 0.0f)
                 col[2] -= 0.01f;
         }
+
         GLES20.glClearColor(col[0], col[1], col[2], col[3]);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -81,22 +84,26 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         Matrix.translateM(but1Trans, 0, mapButtonRelation, 0.5f, 0.0f);
         Matrix.multiplyMM(but1Mat, 0, but1Trans, 0, but1Mat, 0);
 
+        Matrix.setIdentityM(boardMat, 0);
+        Matrix.translateM(boardMat, 0, mapButtonRelation-1.0f, 0.0f, 0.0f);
+        Matrix.scaleM(boardMat, 0, mapButtonRelation, 1.0f, 1.0f);
+
         if(pointerDown && pointerX > mapButtonRelation && pointerY < 0.5f) {
             but.buttonHover();
+        } else if(pointerDown && pointerX < mapButtonRelation) {
+            //TODO: what happens when touched in the board
         } else {
             but.buttonIdle();
         }
-        //Button.startRendering();
+
         but.draw(but1Mat);
+        brend.draw(boardMat);
     }
 
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
         mapButtonRelation = (float)height/(float)width;
-        //Matrix.translateM(but1Mat, 0, 1.0f, 0.0f, 0.0f);
-        Matrix.scaleM(but1Mat, 0, (1.0f-mapButtonRelation), 1.0f, 1.0f);
-        //Matrix.translateM(but1Mat, 0, 0.0f, 0.0f, 0.0f);
     }
 
     public static int loadShader(int shaderType, String shaderCode){
