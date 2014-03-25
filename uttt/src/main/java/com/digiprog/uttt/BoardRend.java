@@ -31,7 +31,10 @@ public class BoardRend {
 
     private static FloatBuffer vertexBuffer;
     private static FloatBuffer texBuffer;
+
+    //TODO: coder colors -> designer colorz!
     private float color[] = {0.0f, 0.1f, 0.1f, 1.0f};
+    private float subBoardColor[] = {1.0f, 1.0f, 0.8f, 1.0f};
 
     private static final int COORDS_IN_VERT = 2;
 
@@ -87,16 +90,40 @@ public class BoardRend {
 
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
+
+                GLES20.glUniform4fv(colHandle, 1, color, 0);
+
                 Matrix.setIdentityM(submvp, 0);
-                Matrix.translateM(submvp, 0, (((float)j)-1.0f)/1.5f, (((float)i)-1.0f)/1.5f, 0.0f);
-                Matrix.scaleM(submvp, 0, 1.0f/3.1f, 1.0f/3.1f, 0.0f);
+                Matrix.translateM(submvp, 0, (((float) j) - 1.0f) / 1.5f, (((float) i) - 1.0f) / 1.5f, 0.0f);
+                Matrix.scaleM(submvp, 0, 1.0f / 3.1f, 1.0f / 3.1f, 0.0f);
                 Matrix.multiplyMM(submvp, 0, mvp, 0, submvp, 0);
+
                 GLES20.glUniformMatrix4fv(mvpHandle, 1, false, submvp, 0);
-                GameRenderer.checkGlError("glUniformMatrix4fv");
+
+                GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
+                renderSubBoard(submvp, mvpHandle, colHandle);
+            }
+        }
+        GLES20.glDisableVertexAttribArray(posHandle);
+    }
+
+    void renderSubBoard(float[] mvp, int mvpHandle, int colHandle) {
+
+        float submvp[] = new float[16];
+        GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
+
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+
+                Matrix.setIdentityM(submvp, 0);
+                Matrix.translateM(submvp, 0, (((float) j) - 1.0f) / 1.5f, (((float) i) - 1.0f) / 1.5f, 0.0f);
+                Matrix.scaleM(submvp, 0, 1.0f / 3.1f, 1.0f / 3.1f, 0.0f);
+                Matrix.multiplyMM(submvp, 0, mvp, 0, submvp, 0);
+
+                GLES20.glUniformMatrix4fv(mvpHandle, 1, false, submvp, 0);
 
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
             }
         }
-        GLES20.glDisableVertexAttribArray(posHandle);
     }
 }
