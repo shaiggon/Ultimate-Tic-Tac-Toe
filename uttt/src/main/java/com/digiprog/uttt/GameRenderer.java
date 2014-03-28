@@ -105,6 +105,11 @@ public class GameRenderer implements GLSurfaceView.Renderer{
                 zoomOn = !zoomOn;
                 brend.zoomOn = zoomOn;
             }
+
+            if(pointerX < mapButtonRelation) {
+                brend.nextZoomX = (int)(3.0f*pointerX/mapButtonRelation);
+                brend.nextZoomY = (int)(3.0f*(1.0f-pointerY));
+            }
         }
 
         brend.draw(boardMat);

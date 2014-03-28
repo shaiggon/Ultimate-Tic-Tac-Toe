@@ -42,6 +42,10 @@ public class BoardRend {
     private float mvp[] = new float[16];
 
     public boolean zoomOn = false;
+    public int nextZoomX = 1;
+    public int nextZoomY = 1;
+    private float smoothNextX = 0.0f;
+    private float smoothNextY = 0.0f;
     private float zoom = 0.0f;
 
     static float coords[] = {
@@ -102,8 +106,10 @@ public class BoardRend {
         } else {
             zoom = zoom*0.95f; //+0.0f*0.04f;
         }
+        smoothNextX = smoothNextX*0.95f + (1.0f-(float)nextZoomX)*0.05f;
+        smoothNextY = smoothNextY*0.95f + (1.0f-(float)nextZoomY)*0.05f;
         //zoom = (float)Math.sin(time) + 2.0f;
-        Matrix.translateM(mvp, 0, zoom, zoom, 0.0f);
+        Matrix.translateM(mvp, 0, zoom*smoothNextX, zoom*smoothNextY, 0.0f);
         Matrix.scaleM(mvp, 0, zoom+1.0f, zoom+1.0f, zoom);
 
         float submvp[] = new float[16];
