@@ -34,6 +34,7 @@ public class GameRenderer implements GLSurfaceView.Renderer{
 
     //tells where is the line between button and game board
     private float mapButtonRelation = 0.8f;
+    private boolean zoomOn;
 
     public GameRenderer(/*TODO: give this the game*/) {
         col = new float[4];
@@ -54,6 +55,7 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         Matrix.setIdentityM(but1Trans, 0);
         pointerDown = false;
         pointerPressed = false;
+        zoomOn = false;
     }
 
     @Override
@@ -76,10 +78,9 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         GLES20.glClearColor(col[0], col[1], col[2], col[3]);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-
-
         Matrix.setIdentityM(but1Mat, 0);
         Matrix.setIdentityM(but1Trans, 0);
+
         Matrix.scaleM(but1Mat, 0, (1.0f-mapButtonRelation), 0.5f, 1.0f);
         Matrix.translateM(but1Trans, 0, mapButtonRelation, 0.5f, 0.0f);
         Matrix.multiplyMM(but1Mat, 0, but1Trans, 0, but1Mat, 0);
@@ -96,8 +97,18 @@ public class GameRenderer implements GLSurfaceView.Renderer{
             but.buttonIdle();
         }
 
-        but.draw(but1Mat);
+        if(pointerPressed) {
+
+            pointerPressed = false;
+
+            if(pointerX > mapButtonRelation && pointerY < 0.5f) {
+                zoomOn = !zoomOn;
+                brend.zoomOn = zoomOn;
+            }
+        }
+
         brend.draw(boardMat);
+        but.draw(but1Mat);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.digiprog.uttt;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -38,6 +39,11 @@ public class BoardRend {
 
     private static final int COORDS_IN_VERT = 2;
 
+    private float mvp[] = new float[16];
+
+    public boolean zoomOn = false;
+    private float zoom = 0.0f;
+
     static float coords[] = {
             //upper right triangle starting from up and right
             1.0f, 1.0f,
@@ -71,8 +77,8 @@ public class BoardRend {
         GLES20.glLinkProgram(mProgram);
     }
 
-    //TODO: add texturing
-    public void draw(float[] mvp) {
+    //TODO: add zooming
+    public void draw(float[] mvp_) {
         GLES20.glUseProgram(mProgram);
         int posHandle = GLES20.glGetAttribLocation(mProgram, "pos");
         GameRenderer.checkGlError("glGetAttribLocation");
@@ -85,6 +91,20 @@ public class BoardRend {
 
         int mvpHandle = GLES20.glGetUniformLocation(mProgram, "mvp");
         GameRenderer.checkGlError("glGetUniformLocation");
+
+        for(int i = 0; i < 16; i++) {
+            mvp[i] = mvp_[i];
+        }
+
+        float time = (float)SystemClock.uptimeMillis()/100.0f;
+        if(zoomOn) {
+            zoom = zoom*0.95f + 2.0f*0.05f;
+        } else {
+            zoom = zoom*0.95f; //+0.0f*0.04f;
+        }
+        //zoom = (float)Math.sin(time) + 2.0f;
+        Matrix.translateM(mvp, 0, zoom, zoom, 0.0f);
+        Matrix.scaleM(mvp, 0, zoom+1.0f, zoom+1.0f, zoom);
 
         float submvp[] = new float[16];
 
