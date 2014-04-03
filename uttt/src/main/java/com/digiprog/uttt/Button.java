@@ -29,7 +29,9 @@ public class Button {
 
     private static FloatBuffer vertexBuffer;
     private static FloatBuffer texBuffer;
-    private float color[] = {1.0f, 0.1f, 0.5f, 1.0f};
+    private float color[] = {0.70f, 0.87f, 1.0f, 1.0f};
+    private float colorIdle[] = {0.70f, 0.87f, 1.0f, 1.0f};
+    private float colorHover[] = {0.7f, 0.7f, 0.5f, 0.49f};
 
     private static final int COORDS_IN_VERT = 2;
     static float coords[] = {
@@ -100,13 +102,15 @@ public class Button {
     }
 
     public void buttonHover() {
-        color[0] = 0.0f; color[1] = 0.0f; color[2] = 1.0f;
+        color[0] = colorHover[0];
+        color[1] = colorHover[1];
+        color[2] = colorHover[2];
     }
     public void buttonIdle() {
         float cSpd = 0.06f;
         float icSpd = 1.0f - cSpd;
-        color[0] = color[0]*icSpd+cSpd*1.0f;
-        color[1] = color[1]*icSpd+cSpd*0.1f;
-        color[2] = color[2]*icSpd+cSpd*0.5f;
+        color[0] = color[0]*icSpd+cSpd*colorIdle[0];
+        color[1] = color[1]*icSpd+cSpd*colorIdle[1];
+        color[2] = color[2]*icSpd+cSpd*colorIdle[2];
     }
 }
