@@ -13,6 +13,8 @@ import java.nio.FloatBuffer;
  * Renders also the circle and the cross :D
  */
 
+
+//TODO: optimize! (minimize the opengl calls)
 public class BoardRend {
     private static final String vertexShaderCode =
             "uniform mat4 mvp;" +
@@ -31,7 +33,7 @@ public class BoardRend {
     private static int mProgram;
 
     private static FloatBuffer vertexBuffer;
-    private static FloatBuffer texBuffer;
+    //private static FloatBuffer texBuffer;
 
     private static FloatBuffer cVertBuf;
 
@@ -45,6 +47,8 @@ public class BoardRend {
 
     private float mvp[] = new float[16];
     private float crossMvp[] = new float[16];
+    private static float cMVP1[] = new float[16];
+    private static float cMVP2[] = new float[16];
 
     public boolean zoomOn = false;
     public int nextZoomX = 1;
@@ -52,7 +56,7 @@ public class BoardRend {
     private float smoothNextX = 0.0f;
     private float smoothNextY = 0.0f;
     private float zoom = 0.0f;
-    private float zoomSpeed = 0.07f;
+    private float zoomSpeed = 0.08f;
 
     private static float coords[] = {
             //upper right triangle starting from up and right
@@ -87,6 +91,7 @@ public class BoardRend {
         vertexBuffer.position(0);
 
         initCircle();
+        initRCrMatrices();
 
         int vShader = GameRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         int fShader = GameRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
@@ -181,13 +186,30 @@ public class BoardRend {
                 GLES20.glUniformMatrix4fv(mvpHandle, 1, false, submvp, 0);
 
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
-                renderSubBoard(submvp, mvpHandle, colHandle, posHandle);
+                renderSubBoard(submvp, mvpHandle, colHandle, posHandle, i, j);
             }
         }
+
+        //float subsubmvp[] = new float[16];
+
+
         GLES20.glDisableVertexAttribArray(posHandle);
     }
 
-    void renderSubBoard(float[] mvp, int mvpHandle, int colHandle, int posHandle) {
+    //doesn't give the right value, because there STILL is no logic :|
+    boolean isCircle(int x, int y, int i, int j) {
+        if(j%3 == 0)
+            return true;
+        return false;
+    }
+
+    boolean isCross(int x, int y, int i, int j) {
+        if(j%3 == 1)
+            return true;
+        return false;
+    }
+
+    void renderSubBoard(float[] mvp, int mvpHandle, int colHandle, int posHandle, int y, int x) {
 
         float submvp[] = new float[16];
         GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
@@ -204,41 +226,68 @@ public class BoardRend {
 
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
 
-                if(j%3 == 0)
+                if(isCircle(x, y, i, j)) {
+                    initRCi(colHandle, posHandle);
                     renderCircle(submvp, mvpHandle, colHandle, posHandle);
-                else if(j%3 == 1)
+                    initBasic(colHandle, posHandle);
+                }
+                if(isCross(x, y, i, j)) {
+                    initRCr(colHandle, posHandle);
                     renderCross(submvp, mvpHandle, colHandle);
+                    initBasic(colHandle, posHandle);
+                }
             }
         }
     }
 
-    void renderCircle(float[] mvp, int mvpHandle, int colHandle, int posHandle) {
+    //initializes the rendering of circles
+    void initRCi(int colHandle, int posHandle) {
         GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, cVertBuf);
 
         GLES20.glUniform4fv(colHandle, 1, circleColor, 0);
-        GLES20.glUniformMatrix4fv(mvpHandle, 1, false, mvp, 0);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, cvCount);
+    }
 
+    void initBasic(int colHandle, int posHandle) {
         GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
         GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
     }
 
-    void renderCross(float[] mvp, int mvpHandle, int colHandle) {
+    void renderCircle(float[] mvp, int mvpHandle, int colHandle, int posHandle) {
+        /*GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, cVertBuf);
 
-        Matrix.setIdentityM(crossMvp, 0);
-        Matrix.rotateM(crossMvp, 0, 45.0f, 0.0f, 0.0f, 1.0f);
-        Matrix.scaleM(crossMvp, 0, 0.2f, 1.0f, 1.0f);
-        Matrix.multiplyMM(crossMvp, 0, mvp, 0, crossMvp, 0);
+        GLES20.glUniform4fv(colHandle, 1, circleColor, 0);*/
+        GLES20.glUniformMatrix4fv(mvpHandle, 1, false, mvp, 0);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, cvCount);
+
+        /*GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
+        GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);*/
+    }
+
+    //initializes the rendering of crosses
+    void initRCr(int colHandle, int posHandle) {
+        //GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
+        GLES20.glUniform4fv(colHandle, 1, crossColor, 0);
+    }
+
+    static void initRCrMatrices() {
+        Matrix.setIdentityM(cMVP1, 0);
+        Matrix.rotateM(cMVP1, 0, 45.0f, 0.0f, 0.0f, 1.0f);
+        Matrix.scaleM(cMVP1, 0, 0.2f, 1.0f, 1.0f);
+
+        Matrix.setIdentityM(cMVP2, 0);
+        Matrix.rotateM(cMVP2, 0, -45.0f, 0.0f, 0.0f, 1.0f);
+        Matrix.scaleM(cMVP2, 0, 0.2f, 1.0f, 1.0f);
+    }
+
+    void renderCross(float[] mvp, int mvpHandle, int colHandle) {
+        Matrix.multiplyMM(crossMvp, 0, mvp, 0, cMVP1, 0);
 
         GLES20.glUniformMatrix4fv(mvpHandle, 1, false, crossMvp, 0);
         GLES20.glUniform4fv(colHandle, 1, crossColor, 0);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
 
-        Matrix.setIdentityM(crossMvp, 0);
-        Matrix.rotateM(crossMvp, 0, -45.0f, 0.0f, 0.0f, 1.0f);
-        Matrix.scaleM(crossMvp, 0, 0.2f, 1.0f, 1.0f);
-        Matrix.multiplyMM(crossMvp, 0, mvp, 0, crossMvp, 0);
+        Matrix.multiplyMM(crossMvp, 0, mvp, 0, cMVP2, 0);
 
         GLES20.glUniformMatrix4fv(mvpHandle, 1, false, crossMvp, 0);
 
