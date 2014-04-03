@@ -190,9 +190,6 @@ public class BoardRend {
             }
         }
 
-        //float subsubmvp[] = new float[16];
-
-
         GLES20.glDisableVertexAttribArray(posHandle);
     }
 
