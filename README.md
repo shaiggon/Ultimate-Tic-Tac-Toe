@@ -1,8 +1,10 @@
 Ultimate-Tic-Tac-Toe
 ====================
 
-Ultimate Tic-Tac-Toe on Android.
+Ultimate Tic-Tac-Toe on Android. Uses OpenGL ES 2.0 for rendering.
 
-Project just started and isn't doing much.
+This is a project for a digital media course in Aalto university.
 
-Uses OpenGL ES 2.0 for rendering.
+The GUI and other graphics programming is made by shaiggon. The game logic was made by Jetch.
+
+A gameplay video can be found in http://youtu.be/s2H2NdVec4A.
