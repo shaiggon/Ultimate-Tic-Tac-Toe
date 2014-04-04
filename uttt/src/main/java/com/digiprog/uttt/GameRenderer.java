@@ -9,7 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-//import android.os.SystemClock;
+import android.os.SystemClock;
 import android.util.Log;
 
 //TODO: maek dis yo dawg
@@ -30,14 +30,20 @@ public class GameRenderer implements GLSurfaceView.Renderer{
 
 
     public Button but;
+    public Button but2;
     public BoardRend brend;
+
     private float but1Mat[];
     private float but1Trans[];
     private float boardMat[];
 
+    private float winningZoom;
+    private float winningTwist;
+
     //tells where is the line between button and game board
     private float mapButtonRelation = 0.8f;
     private boolean zoomOn;
+    private double startOfWin;
 
     public GameRenderer(Logic logic) {
         col = new float[4];
@@ -62,6 +68,10 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         pointerDown = false;
         pointerPressed = false;
         zoomOn = false;
+
+        winningZoom = 1.0f;
+        winningTwist = 0.0f;
+        startOfWin = -1.0;
     }
 
     @Override
@@ -91,9 +101,19 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         Matrix.translateM(but1Trans, 0, mapButtonRelation, 0.5f, 0.0f);
         Matrix.multiplyMM(but1Mat, 0, but1Trans, 0, but1Mat, 0);
 
+
         Matrix.setIdentityM(boardMat, 0);
         Matrix.translateM(boardMat, 0, mapButtonRelation-1.0f, 0.0f, 0.0f);
         Matrix.scaleM(boardMat, 0, mapButtonRelation, 1.0f, 1.0f);
+
+        if(logic.game != Logic.EMPTY) { // twist effect when game won
+            if(startOfWin < 0.0)
+                startOfWin = SystemClock.uptimeMillis()/100.0;
+            Matrix.scaleM(boardMat, 0, winningZoom, winningZoom, 1.0f);
+            Matrix.rotateM(boardMat, 0, winningTwist, 0.0f, 0.0f, 1.0f);
+            winningTwist += 0.5f;
+            winningZoom = ((float)Math.sin(SystemClock.uptimeMillis()/100.0-startOfWin)+1.4f)/1.4f;
+        }
 
         if(pointerDown && pointerX > mapButtonRelation && pointerY < 0.5f) {
             but.buttonHover();
@@ -118,20 +138,36 @@ public class GameRenderer implements GLSurfaceView.Renderer{
                 int chosenX = (int) (3.0f * pointerX / mapButtonRelation);
                 int chosenY = (int) (3.0f * (1.0f - pointerY));
 
-                if(logic.canChooseSubBoardFreely() && !zoomOn) {
-                    logic.chooseSubBoard(chosenX, chosenY);
+                if(logic.game == Logic.EMPTY) {
 
-                    brend.nextZoomX = logic.currentRow;
-                    brend.nextZoomY = logic.currentCol;
-                }
+                    if (logic.canChooseSubBoardFreely() && !zoomOn) {
+                        logic.chooseSubBoard(chosenX, chosenY);
 
-                else if(zoomOn) {
-                    logic.updateGame(chosenX, chosenY);
-                    brend.nextZoomX = logic.currentRow;
-                    brend.nextZoomY = logic.currentCol;
-                    if(logic.canChooseSubBoardFreely()) {
-                        zoomOn = false;
-                        brend.zoomOn = zoomOn;
+                        brend.nextZoomX = logic.currentRow;
+                        brend.nextZoomY = logic.currentCol;
+                    } else if (zoomOn) {
+
+                        logic.updateGame(chosenX, chosenY);
+                        brend.nextZoomX = logic.currentRow;
+                        brend.nextZoomY = logic.currentCol;
+
+                        if (logic.canChooseSubBoardFreely()) {
+                            zoomOn = false;
+                            brend.zoomOn = zoomOn;
+                        }
+
+                        if(logic.game != Logic.EMPTY) {
+                            zoomOn = false;
+                            brend.zoomOn = zoomOn;
+                            brend.nextZoomX = 1;
+                            brend.nextZoomY = 1;
+                        }
+                    }
+                } else {
+                    zoomOn = false;
+                    brend.zoomOn = zoomOn;
+                    if(chosenX == 1 && chosenY == 1) {
+                        logic.init();
                     }
                 }
 

@@ -191,11 +191,11 @@ public class BoardRend {
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
                 renderSubBoard(submvp, mvpHandle, colHandle, posHandle, i, j);
 
-                if(logic.subBoardWon(j, i) == logic.CIRCLE) {
+                if(logic.subBoardWon(j, i) == Logic.CIRCLE) {
                     initRCi(colHandle, posHandle);
                     renderCircle(submvp, mvpHandle, colHandle, posHandle);
                     initBasic(colHandle, posHandle);
-                } else if(logic.subBoardWon(j, i) == logic.CROSS) {
+                } else if(logic.subBoardWon(j, i) == Logic.CROSS) {
                     initRCr(colHandle, posHandle);
                     renderCross(submvp, mvpHandle, colHandle);
                     initBasic(colHandle, posHandle);
@@ -203,11 +203,11 @@ public class BoardRend {
             }
         }
 
-        if(logic.game == logic.CIRCLE) {
+        if(logic.game == Logic.CIRCLE) {
             initRCi(colHandle, posHandle);
             renderCircle(mvp, mvpHandle, colHandle, posHandle);
             initBasic(colHandle, posHandle);
-        } else if(logic.game == logic.CROSS) {
+        } else if(logic.game == Logic.CROSS) {
             initRCr(colHandle, posHandle);
             renderCross(mvp, mvpHandle, colHandle);
             initBasic(colHandle, posHandle);
@@ -218,11 +218,11 @@ public class BoardRend {
 
     //doesn't give the right value, because there STILL is no logic :|
     boolean isCircle(int x, int y, int i, int j) {
-        return logic.getGameMark(x, y, j, i) == logic.CIRCLE;
+        return logic.getGameMark(x, y, j, i) == Logic.CIRCLE;
     }
 
     boolean isCross(int x, int y, int i, int j) {
-        return logic.getGameMark(x, y, j, i) == logic.CROSS;
+        return logic.getGameMark(x, y, j, i) == Logic.CROSS;
     }
 
     void renderSubBoard(float[] mvp, int mvpHandle, int colHandle, int posHandle, int y, int x) {
@@ -269,14 +269,8 @@ public class BoardRend {
     }
 
     void renderCircle(float[] mvp, int mvpHandle, int colHandle, int posHandle) {
-        /*GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, cVertBuf);
-
-        GLES20.glUniform4fv(colHandle, 1, circleColor, 0);*/
         GLES20.glUniformMatrix4fv(mvpHandle, 1, false, mvp, 0);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, cvCount);
-
-        /*GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
-        GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);*/
     }
 
     //initializes the rendering of crosses
@@ -310,5 +304,9 @@ public class BoardRend {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
 
         GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
+    }
+
+    void renderEnd() {
+
     }
 }
