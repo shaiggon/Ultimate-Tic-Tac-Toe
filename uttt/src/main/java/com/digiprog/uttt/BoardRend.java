@@ -13,8 +13,7 @@ import java.nio.FloatBuffer;
  * Renders also the circle and the cross :D
  */
 
-
-//TODO: optimize! (minimize the opengl calls)
+//everything would be better if everything used vertex array objects
 public class BoardRend {
 
     public Logic logic;
@@ -306,7 +305,30 @@ public class BoardRend {
         GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
     }
 
-    void renderEnd() {
+    void renderCrossOutside(float[] mvp_) {
+        GLES20.glUseProgram(mProgram);
+        int posHandle = GLES20.glGetAttribLocation(mProgram, "pos");
+        GLES20.glEnableVertexAttribArray(posHandle);
+        GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
 
+        int colHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+
+        int mvpHandle = GLES20.glGetUniformLocation(mProgram, "mvp");
+
+        renderCross(mvp_, mvpHandle, colHandle);
+    }
+
+    void renderCircleOutside(float[] mvp_) {
+        GLES20.glUseProgram(mProgram);
+        int posHandle = GLES20.glGetAttribLocation(mProgram, "pos");
+        GLES20.glEnableVertexAttribArray(posHandle);
+
+        int colHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+
+        initRCi(colHandle, posHandle);
+
+        int mvpHandle = GLES20.glGetUniformLocation(mProgram, "mvp");
+
+        renderCircle(mvp_, mvpHandle, colHandle, posHandle);
     }
 }

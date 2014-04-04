@@ -34,6 +34,7 @@ public class GameRenderer implements GLSurfaceView.Renderer{
     public BoardRend brend;
 
     private float but1Mat[];
+    private float but2Mat[];
     private float but1Trans[];
     private float boardMat[];
 
@@ -53,13 +54,19 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         up = false;
 
         but = new Button();
+        but2 = new Button();
         brend = new BoardRend();
+
+        but2.color[0] = 1.0f*0.9f;//{1.0f, 1.0f, 0.8f, 1.0f};
+        but2.color[1] = 1.0f*0.9f;
+        but2.color[2] = 0.8f*0.9f;
 
         this.logic = logic;
         brend.logic = logic;
 
         mvp = new float[16];
         but1Mat = new float[16];
+        but2Mat = new float[16];
         but1Trans = new float[16];
         boardMat = new float[16];
         Matrix.setIdentityM(mvp, 0);
@@ -96,23 +103,31 @@ public class GameRenderer implements GLSurfaceView.Renderer{
 
         Matrix.setIdentityM(but1Mat, 0);
         Matrix.setIdentityM(but1Trans, 0);
+        Matrix.setIdentityM(but2Mat, 0);
 
+        //BUTTON 1 MATRICES
         Matrix.scaleM(but1Mat, 0, (1.0f-mapButtonRelation), 0.5f, 1.0f);
         Matrix.translateM(but1Trans, 0, mapButtonRelation, 0.5f, 0.0f);
         Matrix.multiplyMM(but1Mat, 0, but1Trans, 0, but1Mat, 0);
+
+        //BUTTON 2 MATRICES
+        Matrix.translateM(but2Mat, 0, mapButtonRelation, -0.5f, 0.0f);
+        Matrix.scaleM(but2Mat, 0, (1.0f-mapButtonRelation), 0.5f, 1.0f);
 
 
         Matrix.setIdentityM(boardMat, 0);
         Matrix.translateM(boardMat, 0, mapButtonRelation-1.0f, 0.0f, 0.0f);
         Matrix.scaleM(boardMat, 0, mapButtonRelation, 1.0f, 1.0f);
 
-        if(logic.game != Logic.EMPTY) { // twist effect when game won
+
+        // twist effect when game won
+        if(logic.game != Logic.EMPTY) {
             if(startOfWin < 0.0)
-                startOfWin = SystemClock.uptimeMillis()/100.0;
+                startOfWin = SystemClock.uptimeMillis()/170.0;
             Matrix.scaleM(boardMat, 0, winningZoom, winningZoom, 1.0f);
             Matrix.rotateM(boardMat, 0, winningTwist, 0.0f, 0.0f, 1.0f);
             winningTwist += 0.5f;
-            winningZoom = ((float)Math.sin(SystemClock.uptimeMillis()/100.0-startOfWin)+1.4f)/1.4f;
+            winningZoom = ((float)Math.sin(SystemClock.uptimeMillis()/170.0-startOfWin)+1.2f)/1.2f;
         }
 
         if(pointerDown && pointerX > mapButtonRelation && pointerY < 0.5f) {
@@ -168,6 +183,8 @@ public class GameRenderer implements GLSurfaceView.Renderer{
                     brend.zoomOn = zoomOn;
                     if(chosenX == 1 && chosenY == 1) {
                         logic.init();
+                        winningZoom = 1.0f;
+                        winningTwist = 0.0f;
                     }
                 }
 
@@ -176,6 +193,12 @@ public class GameRenderer implements GLSurfaceView.Renderer{
 
         brend.draw(boardMat);
         but.draw(but1Mat);
+        but2.draw(but2Mat);
+
+        if(logic.getNextPlayer() == Logic.CIRCLE)
+            brend.renderCircleOutside(but2Mat);
+        else
+            brend.renderCrossOutside(but2Mat);
     }
 
     @Override
