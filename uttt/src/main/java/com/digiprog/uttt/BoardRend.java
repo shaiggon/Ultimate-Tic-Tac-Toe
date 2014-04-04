@@ -40,10 +40,13 @@ public class BoardRend {
     private static FloatBuffer cVertBuf;
 
     //TODO: coder colors -> designer colorz!
-    private float color[] = {0.0f, 0.1f, 0.1f, 1.0f};
-    private float subBoardColor[] = {1.0f, 1.0f, 0.8f, 1.0f};
-    private float circleColor[] = {1.0f, 0.3f, 0.0f, 1.0f};
-    private float crossColor[] = {0.0f, 0.3f, 1.0f, 1.0f};
+    //private float color[] = {0.0f, 0.1f, 0.1f, 1.0f};
+    //private float subBoardColor[] = {1.0f, 1.0f, 0.8f, 1.0f};
+    private float color[] = {1.0f, 1.0f, 0.8f, 1.0f};
+    private float subBoardColor[] = {0.0f, 0.1f, 0.1f, 1.0f};
+    private float hilightSubBoardColor[] = {0.1f, 0.3f, 0.3f, 1.0f};
+    private float circleColor[] = {1.0f, 0.5f, 0.2f, 1.0f};
+    private float crossColor[] = {0.2f, 0.5f, 1.0f, 1.0f};
 
     private static final int COORDS_IN_VERT = 2;
 
@@ -185,9 +188,9 @@ public class BoardRend {
                 Matrix.scaleM(submvp, 0, 1.0f / 3.1f, 1.0f / 3.1f, 0.0f);
                 Matrix.multiplyMM(submvp, 0, mvp, 0, submvp, 0);
 
-                GLES20.glUniformMatrix4fv(mvpHandle, 1, false, submvp, 0);
+                //GLES20.glUniformMatrix4fv(mvpHandle, 1, false, submvp, 0);
 
-                GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
+                //GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
                 renderSubBoard(submvp, mvpHandle, colHandle, posHandle, i, j);
 
                 if(logic.subBoardWon(j, i) == Logic.CIRCLE) {
@@ -227,7 +230,11 @@ public class BoardRend {
     void renderSubBoard(float[] mvp, int mvpHandle, int colHandle, int posHandle, int y, int x) {
 
         float submvp[] = new float[16];
-        GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
+        if(logic.currentCol == y && logic.currentRow == x) {
+            GLES20.glUniform4fv(colHandle, 1, hilightSubBoardColor, 0);
+        } else {
+            GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
+        }
 
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
@@ -245,11 +252,23 @@ public class BoardRend {
                     initRCi(colHandle, posHandle);
                     renderCircle(submvp, mvpHandle, colHandle, posHandle);
                     initBasic(colHandle, posHandle);
+
+                    if(logic.currentCol == y && logic.currentRow == x) {
+                        GLES20.glUniform4fv(colHandle, 1, hilightSubBoardColor, 0);
+                    } else {
+                        GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
+                    }
                 }
                 if(isCross(x, y, i, j)) {
                     initRCr(colHandle, posHandle);
                     renderCross(submvp, mvpHandle, colHandle);
                     initBasic(colHandle, posHandle);
+
+                    if(logic.currentCol == y && logic.currentRow == x) {
+                        GLES20.glUniform4fv(colHandle, 1, hilightSubBoardColor, 0);
+                    } else {
+                        GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
+                    }
                 }
             }
         }
@@ -331,4 +350,17 @@ public class BoardRend {
 
         renderCircle(mvp_, mvpHandle, colHandle, posHandle);
     }
+
+    /*void renderZoom(float[] mvp_, boolean zOn) {
+        GLES20.glUseProgram(mProgram);
+        int posHandle = GLES20.glGetAttribLocation(mProgram, "pos");
+        GLES20.glEnableVertexAttribArray(posHandle);
+        GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
+
+        int colHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+
+        int mvpHandle = GLES20.glGetUniformLocation(mProgram, "mvp");
+
+
+    }*/
 }

@@ -2,6 +2,7 @@ package com.digiprog.uttt;
 
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,7 +29,11 @@ public class FullscreenActivity extends Activity {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
         } else {
-            //TODO: hiding on API >= 16
+            View decorView = getWindow().getDecorView();
+            int uiOpt = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOpt);
+            ActionBar actionBar = getActionBar();
+            actionBar.hide();
         }
 
         mGLSV = new GLGameSurfaceView(this);

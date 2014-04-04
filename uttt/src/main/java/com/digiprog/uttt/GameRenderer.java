@@ -57,9 +57,9 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         but2 = new Button();
         brend = new BoardRend();
 
-        but2.color[0] = 1.0f*0.9f;//{1.0f, 1.0f, 0.8f, 1.0f};
-        but2.color[1] = 1.0f*0.9f;
-        but2.color[2] = 0.8f*0.9f;
+        but2.color[0] = 1.0f*0.95f;//{1.0f, 1.0f, 0.8f, 1.0f};
+        but2.color[1] = 1.0f*0.95f;
+        but2.color[2] = 0.8f*0.95f;
 
         this.logic = logic;
         brend.logic = logic;
@@ -97,6 +97,8 @@ public class GameRenderer implements GLSurfaceView.Renderer{
             if(col[2] > 0.0f)
                 col[2] -= 0.01f;
         }
+        //col[2] = (float)(Math.sin(SystemClock.uptimeMillis()/400.0)*0.3+0.6);
+
 
         GLES20.glClearColor(col[0], col[1], col[2], col[3]);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -105,16 +107,16 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         Matrix.setIdentityM(but1Trans, 0);
         Matrix.setIdentityM(but2Mat, 0);
 
-        //BUTTON 1 MATRICES
+        //BUTTON 1 MATRIX
         Matrix.scaleM(but1Mat, 0, (1.0f-mapButtonRelation), 0.5f, 1.0f);
         Matrix.translateM(but1Trans, 0, mapButtonRelation, 0.5f, 0.0f);
         Matrix.multiplyMM(but1Mat, 0, but1Trans, 0, but1Mat, 0);
 
-        //BUTTON 2 MATRICES
+        //BUTTON 2 MATRIX
         Matrix.translateM(but2Mat, 0, mapButtonRelation, -0.5f, 0.0f);
         Matrix.scaleM(but2Mat, 0, (1.0f-mapButtonRelation), 0.5f, 1.0f);
 
-
+        //BOARD MATRIX
         Matrix.setIdentityM(boardMat, 0);
         Matrix.translateM(boardMat, 0, mapButtonRelation-1.0f, 0.0f, 0.0f);
         Matrix.scaleM(boardMat, 0, mapButtonRelation, 1.0f, 1.0f);
@@ -134,7 +136,6 @@ public class GameRenderer implements GLSurfaceView.Renderer{
             but.buttonHover();
         } else if(pointerDown && pointerX < mapButtonRelation) {
             //TODO: what happens when touched in the board
-
         } else {
             but.buttonIdle();
         }
@@ -195,6 +196,7 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         but.draw(but1Mat);
         but2.draw(but2Mat);
 
+        Matrix.scaleM(but2Mat, 0, 0.5f/(mapButtonRelation), 1.0f, 1.0f);
         if(logic.getNextPlayer() == Logic.CIRCLE)
             brend.renderCircleOutside(but2Mat);
         else

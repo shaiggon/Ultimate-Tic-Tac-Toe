@@ -41,6 +41,8 @@ public class Logic {
         //currentBoard = subBoard[1][1];
         currentRow = 1;
         currentCol = 1;
+        //nextCol = 1;
+        //nextRow = 1;
     }
 
     // subBoardRow ja subBoardCol tulee suoraan current
