@@ -49,7 +49,7 @@ public class Logic {
 
     public boolean updateGame(int cellRow, int cellCol) {
         if (putGameMark(currentRow, currentCol, cellRow, cellCol)) {
-            if (gameWon() == EMPTY) {
+            if (gameWon() == EMPTY && !isDraw()) {
                 player = player == CROSS ? CIRCLE : CROSS;
             }
             currentRow = nextRow;
@@ -127,6 +127,17 @@ public class Logic {
             return game;
         }
         return game;
+    }
+
+    public boolean isDraw() {
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                if(subBoardWon(i, j) == EMPTY)
+                    return false;
+            }
+        }
+        game = DRAW;
+        return true;
     }
 }
 

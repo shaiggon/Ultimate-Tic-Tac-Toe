@@ -181,7 +181,7 @@ public class BoardRend {
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
 
-                GLES20.glUniform4fv(colHandle, 1, color, 0);
+                //GLES20.glUniform4fv(colHandle, 1, color, 0);
 
                 Matrix.setIdentityM(submvp, 0);
                 Matrix.translateM(submvp, 0, (((float) j) - 1.0f) / 1.5f, (((float) i) - 1.0f) / 1.5f, 0.0f);
@@ -205,6 +205,7 @@ public class BoardRend {
             }
         }
 
+        //Draws the winner
         if(logic.game == Logic.CIRCLE) {
             initRCi(colHandle, posHandle);
             renderCircle(mvp, mvpHandle, colHandle, posHandle);
@@ -351,16 +352,46 @@ public class BoardRend {
         renderCircle(mvp_, mvpHandle, colHandle, posHandle);
     }
 
-    /*void renderZoom(float[] mvp_, boolean zOn) {
+    void renderZoom(float[] mvp_, boolean zOn) {
         GLES20.glUseProgram(mProgram);
         int posHandle = GLES20.glGetAttribLocation(mProgram, "pos");
         GLES20.glEnableVertexAttribArray(posHandle);
         GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
 
         int colHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+        GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
 
         int mvpHandle = GLES20.glGetUniformLocation(mProgram, "mvp");
 
+        Matrix.setIdentityM(crossMvp, 0);
+        Matrix.scaleM(crossMvp, 0, 0.5f*0.6f, 0.5f*0.6f, 1.0f);
 
-    }*/
+        if(!zOn) {
+            Matrix.scaleM(crossMvp, 0, 0.2f, 1.0f, 1.0f);
+            Matrix.multiplyMM(crossMvp, 0, mvp_, 0, crossMvp, 0);
+
+            GLES20.glUniformMatrix4fv(mvpHandle, 1, false, crossMvp, 0);
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
+        } else {
+            Matrix.multiplyMM(crossMvp, 0, mvp_, 0, crossMvp, 0);
+        }
+
+        float zMult = 1.0f;
+        if(!zOn)
+            zMult = 1.0f/0.2f;
+
+        Matrix.scaleM(crossMvp, 0, zMult, 1.0f, 1.0f);
+        Matrix.scaleM(crossMvp, 0, 1.0f, 0.2f, 1.0f);
+
+        GLES20.glUniformMatrix4fv(mvpHandle, 1, false, crossMvp, 0);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
+
+        Matrix.scaleM(crossMvp, 0, 1.0f/0.5f, 1.0f/0.5f, 1.0f);
+
+        GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, cVertBuf);
+        Matrix.scaleM(crossMvp, 0, 1.0f, 1.0f/0.2f, 1.0f);
+
+        GLES20.glUniformMatrix4fv(mvpHandle, 1, false, crossMvp, 0);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, cvCount);
+    }
 }

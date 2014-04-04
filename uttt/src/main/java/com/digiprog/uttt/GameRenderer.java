@@ -182,11 +182,9 @@ public class GameRenderer implements GLSurfaceView.Renderer{
                 } else {
                     zoomOn = false;
                     brend.zoomOn = zoomOn;
-                    if(chosenX == 1 && chosenY == 1) {
-                        logic.init();
-                        winningZoom = 1.0f;
-                        winningTwist = 0.0f;
-                    }
+                    logic.init();
+                    winningZoom = 1.0f;
+                    winningTwist = 0.0f;
                 }
 
             }
@@ -194,6 +192,7 @@ public class GameRenderer implements GLSurfaceView.Renderer{
 
         brend.draw(boardMat);
         but.draw(but1Mat);
+        brend.renderZoom(but1Mat, zoomOn);
         but2.draw(but2Mat);
 
         Matrix.scaleM(but2Mat, 0, 0.5f/(mapButtonRelation), 1.0f, 1.0f);
