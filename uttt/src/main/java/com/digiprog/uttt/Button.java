@@ -30,7 +30,7 @@ public class Button {
     private static FloatBuffer vertexBuffer;
     private static FloatBuffer texBuffer;
     public float color[] = {0.70f, 0.87f, 1.0f, 1.0f};
-    private float colorIdle[] = {0.70f, 0.87f, 1.0f, 1.0f};
+    private float colorIdle[] = {0.07f, 0.07f, 0.1f, 1.0f};
     private float colorHover[] = {0.7f, 0.7f, 0.5f, 0.49f};
 
     private static final int COORDS_IN_VERT = 2;

@@ -192,10 +192,11 @@ public class GameRenderer implements GLSurfaceView.Renderer{
 
         brend.draw(boardMat);
         but.draw(but1Mat);
+        Matrix.scaleM(but1Mat, 0, 0.5f/(mapButtonRelation), 1.0f, 1.0f);
         brend.renderZoom(but1Mat, zoomOn);
         but2.draw(but2Mat);
 
-        Matrix.scaleM(but2Mat, 0, 0.5f/(mapButtonRelation), 1.0f, 1.0f);
+        Matrix.scaleM(but2Mat, 0, 0.5f/(mapButtonRelation)*0.6f, 0.6f, 0.6f);
         if(logic.getNextPlayer() == Logic.CIRCLE)
             brend.renderCircleOutside(but2Mat);
         else

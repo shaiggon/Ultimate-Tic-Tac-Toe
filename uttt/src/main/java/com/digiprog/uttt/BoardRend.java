@@ -219,7 +219,6 @@ public class BoardRend {
         GLES20.glDisableVertexAttribArray(posHandle);
     }
 
-    //doesn't give the right value, because there STILL is no logic :|
     boolean isCircle(int x, int y, int i, int j) {
         return logic.getGameMark(x, y, j, i) == Logic.CIRCLE;
     }
@@ -359,7 +358,7 @@ public class BoardRend {
         GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
 
         int colHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
-        GLES20.glUniform4fv(colHandle, 1, subBoardColor, 0);
+        GLES20.glUniform4fv(colHandle, 1, color, 0);
 
         int mvpHandle = GLES20.glGetUniformLocation(mProgram, "mvp");
 
