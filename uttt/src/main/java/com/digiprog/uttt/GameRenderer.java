@@ -117,9 +117,8 @@ public class GameRenderer implements GLSurfaceView.Renderer{
 
                 int chosenX = (int) (3.0f * pointerX / mapButtonRelation);
                 int chosenY = (int) (3.0f * (1.0f - pointerY));
+
                 if(logic.canChooseSubBoardFreely() && !zoomOn) {
-                    //brend.nextZoomX = (int) (3.0f * pointerX / mapButtonRelation);
-                    //brend.nextZoomY = (int) (3.0f * (1.0f - pointerY));
                     logic.chooseSubBoard(chosenX, chosenY);
 
                     brend.nextZoomX = logic.currentRow;
@@ -130,8 +129,11 @@ public class GameRenderer implements GLSurfaceView.Renderer{
                     logic.updateGame(chosenX, chosenY);
                     brend.nextZoomX = logic.currentRow;
                     brend.nextZoomY = logic.currentCol;
+                    if(logic.canChooseSubBoardFreely()) {
+                        zoomOn = false;
+                        brend.zoomOn = zoomOn;
+                    }
                 }
-
 
             }
         }

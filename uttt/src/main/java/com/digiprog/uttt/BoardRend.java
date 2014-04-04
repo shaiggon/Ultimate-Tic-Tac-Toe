@@ -203,6 +203,16 @@ public class BoardRend {
             }
         }
 
+        if(logic.game == logic.CIRCLE) {
+            initRCi(colHandle, posHandle);
+            renderCircle(mvp, mvpHandle, colHandle, posHandle);
+            initBasic(colHandle, posHandle);
+        } else if(logic.game == logic.CROSS) {
+            initRCr(colHandle, posHandle);
+            renderCross(mvp, mvpHandle, colHandle);
+            initBasic(colHandle, posHandle);
+        }
+
         GLES20.glDisableVertexAttribArray(posHandle);
     }
 

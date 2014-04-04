@@ -46,13 +46,13 @@ public class Logic {
     // subBoardRow ja subBoardCol tulee suoraan current
 
     public boolean updateGame(int cellRow, int cellCol) {
-        if (putGameMark(currentRow, currentCol, cellRow, cellCol) && subBoardWon(currentRow, currentCol) == EMPTY) {
+        if (putGameMark(currentRow, currentCol, cellRow, cellCol)) {
             if (gameWon() == EMPTY) {
                 player = player == CROSS ? CIRCLE : CROSS;
             }
             currentRow = nextRow;
             currentCol = nextCol;
-            chooseFreely = subBoardWon(currentRow, currentCol) == EMPTY;
+            chooseFreely = subBoardWon(currentRow, currentCol) != EMPTY;
             return true;
         }
         return false;
@@ -73,7 +73,7 @@ public class Logic {
     //puts a new mark on the board
     //returns false if mark cannot be put there, true if mark put successfully
     public boolean putGameMark(int subBoardRow, int subBoardCol, int cellRow, int cellCol) {
-        if (subBoard[subBoardRow][subBoardCol].cell[cellRow][cellCol] == EMPTY) {
+        if (subBoard[subBoardRow][subBoardCol].cell[cellRow][cellCol] == EMPTY  && subBoardWon(subBoardRow, subBoardCol) == EMPTY) {
             nextRow = cellRow;
             nextCol = cellCol;
             subBoard[subBoardRow][subBoardCol].cell[cellRow][cellCol] = player;
@@ -97,7 +97,7 @@ public class Logic {
 
         //chooses sub board. returns false if sub board is already won, otherwise returns true
     public boolean chooseSubBoard(int row, int col){
-        if (subBoardWon(row, col) == EMPTY) {
+        if (subBoardWon(row, col) == EMPTY && chooseFreely) {
             currentRow = row;
             currentCol = col;
             return true;
@@ -117,10 +117,10 @@ public class Logic {
     //returns who won the game
     //if game hasn't been won, return EMPTY
     public char gameWon(){
-        if ((subBoard[currentRow][0].state == player && subBoard[currentRow][1].state == player && subBoard[currentRow][2].state == player)
-                || (subBoard[0][currentCol].state == player && subBoard[1][currentCol].state == player && subBoard[currentCol][2].state == player)
-                || (subBoard[0][0].state == player && subBoard[1][1].state == player && subBoard[2][2].state == player)
-                || (subBoard[0][2].state == player && subBoard[1][1].state == player && subBoard[2][0].state == player)) {
+        if ((subBoardWon(currentRow, 0) == player && subBoardWon(currentRow, 1) == player && subBoardWon(currentRow, 2) == player)
+                || (subBoardWon(0, currentCol) == player && subBoardWon(1, currentCol) == player && subBoardWon(2, currentCol) == player)
+                || (subBoardWon(0, 0) == player && subBoardWon(1, 1) == player && subBoardWon(2, 2) == player)
+                || (subBoardWon(0, 2) == player && subBoardWon(1, 1) == player && subBoardWon(2, 0) == player)) {
             game = player;
             return game;
         }
