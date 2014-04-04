@@ -16,6 +16,9 @@ import java.nio.FloatBuffer;
 
 //TODO: optimize! (minimize the opengl calls)
 public class BoardRend {
+
+    public Logic logic;
+
     private static final String vertexShaderCode =
             "uniform mat4 mvp;" +
                     "attribute vec2 pos;" +
@@ -187,6 +190,16 @@ public class BoardRend {
 
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
                 renderSubBoard(submvp, mvpHandle, colHandle, posHandle, i, j);
+
+                if(logic.subBoardWon(j, i) == logic.CIRCLE) {
+                    initRCi(colHandle, posHandle);
+                    renderCircle(submvp, mvpHandle, colHandle, posHandle);
+                    initBasic(colHandle, posHandle);
+                } else if(logic.subBoardWon(j, i) == logic.CROSS) {
+                    initRCr(colHandle, posHandle);
+                    renderCross(submvp, mvpHandle, colHandle);
+                    initBasic(colHandle, posHandle);
+                }
             }
         }
 
@@ -195,15 +208,11 @@ public class BoardRend {
 
     //doesn't give the right value, because there STILL is no logic :|
     boolean isCircle(int x, int y, int i, int j) {
-        if(j%3 == 0)
-            return true;
-        return false;
+        return logic.getGameMark(x, y, j, i) == logic.CIRCLE;
     }
 
     boolean isCross(int x, int y, int i, int j) {
-        if(j%3 == 1)
-            return true;
-        return false;
+        return logic.getGameMark(x, y, j, i) == logic.CROSS;
     }
 
     void renderSubBoard(float[] mvp, int mvpHandle, int colHandle, int posHandle, int y, int x) {

@@ -9,10 +9,13 @@ import android.view.MotionEvent;
 public class GLGameSurfaceView extends GLSurfaceView{
     private final GameRenderer mRenderer;
     private float z = 0.0f;
+    private Logic logic;
+
     public GLGameSurfaceView(Context context) {
         super(context);
         setEGLContextClientVersion(2);
-        mRenderer = new GameRenderer();
+        logic = new Logic();
+        mRenderer = new GameRenderer(logic);
         setRenderer(mRenderer);
         //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }

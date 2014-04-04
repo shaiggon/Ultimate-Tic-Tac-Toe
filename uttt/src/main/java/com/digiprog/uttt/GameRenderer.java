@@ -14,6 +14,9 @@ import android.util.Log;
 
 //TODO: maek dis yo dawg
 public class GameRenderer implements GLSurfaceView.Renderer{
+
+    public Logic logic;
+
     private static final String TAG = "GameRenderer";
     public float col[];
     public boolean up;
@@ -36,7 +39,7 @@ public class GameRenderer implements GLSurfaceView.Renderer{
     private float mapButtonRelation = 0.8f;
     private boolean zoomOn;
 
-    public GameRenderer(/*TODO: give this the game*/) {
+    public GameRenderer(Logic logic) {
         col = new float[4];
         for(int i = 0; i < 4; i++) {
             col[i] = 1.0f;
@@ -45,6 +48,9 @@ public class GameRenderer implements GLSurfaceView.Renderer{
 
         but = new Button();
         brend = new BoardRend();
+
+        this.logic = logic;
+        brend.logic = logic;
 
         mvp = new float[16];
         but1Mat = new float[16];
@@ -93,6 +99,7 @@ public class GameRenderer implements GLSurfaceView.Renderer{
             but.buttonHover();
         } else if(pointerDown && pointerX < mapButtonRelation) {
             //TODO: what happens when touched in the board
+
         } else {
             but.buttonIdle();
         }
@@ -107,8 +114,25 @@ public class GameRenderer implements GLSurfaceView.Renderer{
             }
 
             if(pointerX < mapButtonRelation) {
-                brend.nextZoomX = (int)(3.0f*pointerX/mapButtonRelation);
-                brend.nextZoomY = (int)(3.0f*(1.0f-pointerY));
+
+                int chosenX = (int) (3.0f * pointerX / mapButtonRelation);
+                int chosenY = (int) (3.0f * (1.0f - pointerY));
+                if(logic.canChooseSubBoardFreely() && !zoomOn) {
+                    //brend.nextZoomX = (int) (3.0f * pointerX / mapButtonRelation);
+                    //brend.nextZoomY = (int) (3.0f * (1.0f - pointerY));
+                    logic.chooseSubBoard(chosenX, chosenY);
+
+                    brend.nextZoomX = logic.currentRow;
+                    brend.nextZoomY = logic.currentCol;
+                }
+
+                else if(zoomOn) {
+                    logic.updateGame(chosenX, chosenY);
+                    brend.nextZoomX = logic.currentRow;
+                    brend.nextZoomY = logic.currentCol;
+                }
+
+
             }
         }
 
