@@ -2,7 +2,6 @@ package com.digiprog.uttt;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.os.SystemClock;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -40,8 +39,6 @@ public class BoardRend {
     private static FloatBuffer cVertBuf;
 
     //TODO: coder colors -> designer colorz!
-    //private float color[] = {0.0f, 0.1f, 0.1f, 1.0f};
-    //private float subBoardColor[] = {1.0f, 1.0f, 0.8f, 1.0f};
     private float color[] = {1.0f, 1.0f, 0.8f, 1.0f};
     private float subBoardColor[] = {0.0f, 0.1f, 0.1f, 1.0f};
     private float hilightSubBoardColor[] = {0.1f, 0.3f, 0.3f, 1.0f};
@@ -79,12 +76,8 @@ public class BoardRend {
 
     private static float circleCoords[] = new float[6*2*cResolution];
 
-    //static float coords[] = new float[(squareCoords.length/2)*4];
-
     private static final int vCount = coords.length/COORDS_IN_VERT;
     private static final int cvCount = circleCoords.length/COORDS_IN_VERT;
-
-    private float time = 0.0f;
 
     //call this before any rendering starts!
     public static void init() {
@@ -159,8 +152,6 @@ public class BoardRend {
 
         System.arraycopy(mvp_, 0, mvp, 0, 16);
 
-        //time = (float)SystemClock.uptimeMillis()/100.0f;
-
         float zspd = zoomSpeed;
         float izspd = 1.0f-zspd;
 
@@ -172,7 +163,7 @@ public class BoardRend {
 
         smoothNextX = smoothNextX*izspd + (1.0f-(float)nextZoomX)*zspd;
         smoothNextY = smoothNextY*izspd + (1.0f-(float)nextZoomY)*zspd;
-        //zoom = (float)Math.sin(time) + 2.0f;
+
         Matrix.translateM(mvp, 0, zoom*smoothNextX, zoom*smoothNextY, 0.0f);
         Matrix.scaleM(mvp, 0, zoom+1.0f, zoom+1.0f, zoom);
 
@@ -181,16 +172,11 @@ public class BoardRend {
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
 
-                //GLES20.glUniform4fv(colHandle, 1, color, 0);
-
                 Matrix.setIdentityM(submvp, 0);
                 Matrix.translateM(submvp, 0, (((float) j) - 1.0f) / 1.5f, (((float) i) - 1.0f) / 1.5f, 0.0f);
                 Matrix.scaleM(submvp, 0, 1.0f / 3.1f, 1.0f / 3.1f, 0.0f);
                 Matrix.multiplyMM(submvp, 0, mvp, 0, submvp, 0);
 
-                //GLES20.glUniformMatrix4fv(mvpHandle, 1, false, submvp, 0);
-
-                //GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
                 renderSubBoard(submvp, mvpHandle, colHandle, posHandle, i, j);
 
                 if(logic.subBoardWon(j, i) == Logic.CIRCLE) {
@@ -293,7 +279,6 @@ public class BoardRend {
 
     //initializes the rendering of crosses
     void initRCr(int colHandle, int posHandle) {
-        //GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
         GLES20.glUniform4fv(colHandle, 1, crossColor, 0);
     }
 

@@ -12,7 +12,7 @@ import android.opengl.Matrix;
 import android.os.SystemClock;
 import android.util.Log;
 
-//TODO: maek dis yo dawg
+
 public class GameRenderer implements GLSurfaceView.Renderer{
 
     public Logic logic;
@@ -97,7 +97,6 @@ public class GameRenderer implements GLSurfaceView.Renderer{
             if(col[2] > 0.0f)
                 col[2] -= 0.01f;
         }
-        //col[2] = (float)(Math.sin(SystemClock.uptimeMillis()/400.0)*0.3+0.6);
 
 
         GLES20.glClearColor(col[0], col[1], col[2], col[3]);
@@ -135,7 +134,7 @@ public class GameRenderer implements GLSurfaceView.Renderer{
         if(pointerDown && pointerX > mapButtonRelation && pointerY < 0.5f) {
             but.buttonHover();
         } else if(pointerDown && pointerX < mapButtonRelation) {
-            //TODO: what happens when touched in the board
+            //does nothing
         } else {
             but.buttonIdle();
         }

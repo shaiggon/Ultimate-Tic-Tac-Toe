@@ -57,7 +57,6 @@ public class Button {
     private static final int vCount = coords.length/COORDS_IN_VERT;
 
     //call this before any rendering starts!
-    //TODO: add texturing
     public static void init() {
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -80,22 +79,17 @@ public class Button {
         GLES20.glLinkProgram(mProgram);
     }
 
-    //TODO: add texturing
     public void draw(float[] mvp) {
         GLES20.glUseProgram(mProgram);
         int posHandle = GLES20.glGetAttribLocation(mProgram, "pos");
-        GameRenderer.checkGlError("glGetAttribLocation");
         GLES20.glEnableVertexAttribArray(posHandle);
         GLES20.glVertexAttribPointer(posHandle, COORDS_IN_VERT, GLES20.GL_FLOAT, false, 4*COORDS_IN_VERT, vertexBuffer);
 
         int colHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
-        GameRenderer.checkGlError("glGetUniformLocation");
         GLES20.glUniform4fv(colHandle, 1, color, 0);
 
         int mvpHandle = GLES20.glGetUniformLocation(mProgram, "mvp");
-        GameRenderer.checkGlError("glGetUniformLocation");
         GLES20.glUniformMatrix4fv(mvpHandle, 1, false, mvp, 0);
-        GameRenderer.checkGlError("glUniformMatrix4fv");
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vCount);
         GLES20.glDisableVertexAttribArray(posHandle);

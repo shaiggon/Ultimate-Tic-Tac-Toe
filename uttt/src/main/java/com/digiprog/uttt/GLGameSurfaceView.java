@@ -8,7 +8,6 @@ import android.view.MotionEvent;
  */
 public class GLGameSurfaceView extends GLSurfaceView{
     private final GameRenderer mRenderer;
-    private float z = 0.0f;
     private Logic logic;
 
     public GLGameSurfaceView(Context context) {
@@ -17,10 +16,9 @@ public class GLGameSurfaceView extends GLSurfaceView{
         logic = new Logic();
         mRenderer = new GameRenderer(logic);
         setRenderer(mRenderer);
-        //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
-    //TODO: check for input
+
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         float x = e.getX();
@@ -35,12 +33,10 @@ public class GLGameSurfaceView extends GLSurfaceView{
                 mRenderer.col[0] = x/(float)getWidth()*0.1f+mRenderer.col[0]*0.9f;
                 mRenderer.col[1] = y/(float)getHeight()*0.1f+mRenderer.col[1]*0.9f;
                 mRenderer.pointerDown = true;
-                //if(z <= 1.0f) z += 0.01f;
-                //mRenderer.col[2] = z;
                 break;
             case MotionEvent.ACTION_UP:
                 mRenderer.up = true;
-                mRenderer.pointerPressed = true; //TODO: assign to false when detected
+                mRenderer.pointerPressed = true;
                 mRenderer.pointerDown = false;
                 break;
         }

@@ -17,7 +17,6 @@ public class Logic {
     private subBoard subBoard[][];
     public int currentRow, currentCol, nextRow, nextCol; // current row & column Board
     private boolean chooseFreely = true;
-    public subBoard currentBoard;
     public char game = EMPTY;
 
 
@@ -28,7 +27,7 @@ public class Logic {
 
     public void init() {
         player = CROSS;
-        subBoard = new subBoard[3][3]; // miten ton kuuluukaan menna?
+        subBoard = new subBoard[3][3];
         chooseFreely = true;
         //new subBoard();
         game = EMPTY;
@@ -38,14 +37,10 @@ public class Logic {
                 subBoard[row][col] = new subBoard(row, col);
             }
         }
-        //currentBoard = subBoard[1][1];
         currentRow = 1;
         currentCol = 1;
-        //nextCol = 1;
-        //nextRow = 1;
     }
 
-    // subBoardRow ja subBoardCol tulee suoraan current
 
     public boolean updateGame(int cellRow, int cellCol) {
         if (putGameMark(currentRow, currentCol, cellRow, cellCol)) {
@@ -62,10 +57,6 @@ public class Logic {
 
     }
 
-
-    /*private boolean isPlayerCross() {
-        return player == CROSS;
-    }*/
 
     //returns CIRCLE, CROSS or EMPTY based on the mark the cell has
     public char getGameMark(int subBoardRow, int subBoardCol, int cellRow, int cellCol){
@@ -111,7 +102,6 @@ public class Logic {
     //returns who won the sub board
     //if it hasn't been won, return EMPTY
     public char subBoardWon(int subBoardRow, int subBoardCol){
-        //return subBoard[subBoardRow][subBoardCol].state;
         return subBoard[subBoardRow][subBoardCol].getWon();
     }
 
@@ -146,7 +136,6 @@ class subBoard {
     public static final char CROSS = 'x';
     public static final char EMPTY = '_';
     public static final char DRAW = '.';
-    int currentRow, currentCol;
     char state;
     public char[][] cell = new char[3][3];
 
@@ -156,7 +145,6 @@ class subBoard {
     }
 
     public void init() {
-        //for(int i = )
         for (int row = 0; row < 3; row++) {
             cell[row] = new char[3];
             for (int col = 0; col < 3; col++) {
